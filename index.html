@@ -1,1048 +1,409 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <!-- SEO Meta Tags -->
-    <title>Crypto Wallet Scanner | Check for Unclaimed Rewards, Airdrops & Approvals</title>
-    <meta name="description" content="Scan your crypto wallet to discover unclaimed airdrops, rewards, governance votes, and revoked approvals. Find hidden value in your wallet with our free blockchain scanner.">
-    <meta name="keywords" content="crypto wallet checker, unclaimed rewards, airdrop checker, crypto approvals scanner, revoked approvals, staking rewards, wallet scanner, unclaimed crypto, Eigenlayer rewards, Swell rewards">
-    
-    <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="Crypto Wallet Scanner | Find Unclaimed Rewards & Airdrops">
-    <meta property="og:description" content="Instantly scan your wallet for unclaimed rewards, airdrops, and risky approvals across multiple blockchains.">
-    <meta property="og:type" content="website">
-    
-    <!-- Favicon -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💰</text></svg>">
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
+  <script>
         tailwind.config = {
             darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
-                        primary: {
-                            50: '#f0f0ff',
-                            100: '#e3e2ff',
-                            200: '#cbc9fe',
-                            300: '#aba8fd',
-                            400: '#8d87fb',
-                            500: '#7a75f3',
-                            600: '#5D5CDE',
-                            700: '#4744b7',
-                            800: '#393893',
-                            900: '#312f77'
+                        primary: '#5D5CDE',
+                        secondary: '#ff3366',
+                        dark: {
+                            bg: '#181818',
+                            card: '#252525',
+                            text: '#e0e0e0'
                         },
-                        secondary: {
-                            50: '#eefbf2',
-                            100: '#d6f5e1',
-                            200: '#b0eac6',
-                            300: '#7ed7a6',
-                            400: '#4dbd83',
-                            500: '#32a46c',
-                            600: '#238455',
-                            700: '#1e6947',
-                            800: '#1c533b',
-                            900: '#184531'
+                        light: {
+                            bg: '#FFFFFF',
+                            card: '#f5f5f5',
+                            text: '#333333'
                         }
-                    },
-                    fontFamily: {
-                        sans: ['Inter var', 'system-ui', 'sans-serif'],
                     },
                     animation: {
                         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                        'fade-in': 'fadeIn 0.5s ease-in-out',
-                        'slide-up': 'slideUp 0.5s ease-out',
-                    },
-                    keyframes: {
-                        fadeIn: {
-                            '0%': { opacity: '0' },
-                            '100%': { opacity: '1' },
-                        },
-                        slideUp: {
-                            '0%': { transform: 'translateY(20px)', opacity: '0' },
-                            '100%': { transform: 'translateY(0)', opacity: '1' },
-                        }
-                    },
-                    boxShadow: {
-                        'glass': '0 8px 32px rgba(0, 0, 0, 0.1)',
-                        'glass-dark': '0 8px 32px rgba(0, 0, 0, 0.3)',
-                    },
+                    }
                 }
             }
         }
     </script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
         
-        /* Gradient animations */
-        @keyframes gradient {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #5D5CDE 0%, #ff3366 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
         
         .gradient-bg {
-            background: linear-gradient(-45deg, #5D5CDE, #7a75f3, #4744b7, #6563e0);
-            background-size: 400% 400%;
-            animation: gradient 15s ease infinite;
+            background: linear-gradient(135deg, #5D5CDE 0%, #ff3366 100%);
         }
         
-        .dark .gradient-bg {
-            background: linear-gradient(-45deg, #4744b7, #6563e0, #7a75f3, #5D5CDE);
-            background-size: 400% 400%;
-            animation: gradient 15s ease infinite;
+        .upload-area {
+            background: rgba(93, 92, 222, 0.05);
+            border: 2px dashed rgba(93, 92, 222, 0.3);
+            transition: all 0.3s ease;
         }
         
-        /* Glass morphism */
-        .glass {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(12px);
+        .upload-area:hover, .upload-area.dragover {
+            background: rgba(93, 92, 222, 0.1);
+            border-color: #5D5CDE;
         }
         
-        .dark .glass {
-            background: rgba(30, 30, 35, 0.7);
-            backdrop-filter: blur(12px);
+        .progress-bar {
+            background: linear-gradient(90deg, #5D5CDE 0%, #ff3366 100%);
+            background-size: 200% 100%;
+            animation: gradient-shift 2s infinite linear;
         }
         
-        /* Progress bar animations */
-        @keyframes progress {
-            0% { width: 0%; }
-            10% { width: 10%; }
-            20% { width: 20%; }
-            30% { width: 30%; }
-            50% { width: 50%; }
-            70% { width: 75%; }
-            90% { width: 90%; }
-            100% { width: 100%; }
+        @keyframes gradient-shift {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
         }
         
-        .animate-progress {
-            animation: progress 10s ease-in-out;
+        .blur-image {
+            filter: blur(10px);
         }
         
-        /* Glow effect */
-        .glow {
-            box-shadow: 0 0 15px rgba(93, 92, 222, 0.5);
+        /* Custom scrollbar for Webkit browsers */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
         }
         
-        .dark .glow {
-            box-shadow: 0 0 15px rgba(122, 117, 243, 0.5);
+        ::-webkit-scrollbar-track {
+            background: rgba(93, 92, 222, 0.05);
         }
         
-        /* Shake animation for errors */
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(93, 92, 222, 0.5);
+            border-radius: 3px;
         }
         
-        .shake {
-            animation: shake 0.6s cubic-bezier(.36,.07,.19,.97) both;
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(93, 92, 222, 0.8);
+        }
+        
+        .dark .upload-area {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px dashed rgba(255, 255, 255, 0.1);
+        }
+        
+        .dark .upload-area:hover, .dark .upload-area.dragover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.3);
         }
     </style>
 </head>
-<body class="min-h-screen bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300 font-sans">
-    <script>
-        // Check for dark mode preference
-        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-            document.documentElement.classList.add('dark');
-        }
+<body class="bg-light-bg dark:bg-dark-bg text-light-text dark:text-dark-text transition-colors duration-300">
+    <div class="min-h-screen flex flex-col">
+        <!-- Header -->
+        <header class="py-4 px-4 md:px-8 border-b border-gray-200 dark:border-gray-800">
+            <div class="container mx-auto flex justify-between items-center">
+                <div class="flex items-center">
+                    <h1 class="text-2xl md:text-3xl font-bold gradient-text">CHEAT X</h1>
+                    <span class="bg-secondary text-white text-xs px-2 py-1 rounded ml-2 uppercase tracking-wide">Demo</span>
+                </div>
+                <button id="themeToggle" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden dark:block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 block dark:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                    </svg>
+                </button>
+            </div>
+        </header>
         
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
-            if (event.matches) {
-                document.documentElement.classList.add('dark');
-            } else {
-                document.documentElement.classList.remove('dark');
-            }
-        });
-    </script>
-
-    <header class="gradient-bg text-white py-8 md:py-12 px-4 shadow-md relative overflow-hidden">
-        <div class="container mx-auto max-w-5xl relative z-10">
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+        <!-- Main Content -->
+        <main class="flex-grow container mx-auto py-8 px-4 md:px-8">
+            <!-- Hero Section -->
+            <section class="mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4 text-center">First <span class="gradient-text">AI Powered</span> Intelligence Platform</h2>
+                <p class="text-lg md:text-xl text-center text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
+                    Delivering matching, look-alike contents and activities from various sources - from Tinder to OnlyFans with cutting-edge facial recognition and AI technology.
+                </p>
+            </section>
+            
+            <!-- Upload Section -->
+            <section class="bg-light-card dark:bg-dark-card rounded-xl shadow-lg p-6 mb-8">
+                <h3 class="text-xl font-semibold mb-4 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0l-4 4m4-4v12" />
+                    </svg>
+                    Upload Media
+                </h3>
+                <p class="text-gray-600 dark:text-gray-400 mb-4">Upload up to 3 images or videos for analysis</p>
+                
+                <div id="uploadArea" class="upload-area rounded-lg p-8 text-center mb-6 cursor-pointer">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                    </svg>
+                    <p class="mb-2 font-medium">Drag & drop or click to upload</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Supported formats: JPEG, PNG, MP4, MOV (Max 3 files)</p>
+                    <input id="fileInput" type="file" accept="image/*,video/*" multiple class="hidden" />
+                </div>
+                
+                <div id="uploadPreview" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 hidden">
+                    <!-- Preview items will be added here -->
+                </div>
+                
+                <!-- Optional Information Form -->
                 <div>
-                    <h1 class="text-3xl md:text-5xl font-extrabold mb-2 tracking-tight">
-                        Crypto Scanner Pro
-                        <span class="inline-flex items-center justify-center ml-2 px-2 py-1 text-xs font-semibold rounded-full bg-white/20 backdrop-blur-sm">BETA</span>
-                    </h1>
-                    <p class="text-lg md:text-xl font-medium text-white/90 max-w-2xl">Find unclaimed rewards, airdrops, and risky approvals across all blockchains</p>
+                    <h4 class="text-lg font-medium mb-4">Optional Information (to enhance search results)</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                        <div>
+                            <label for="name" class="block text-sm font-medium mb-1">Full Name</label>
+                            <input type="text" id="name" placeholder="E.g., Kate Merry" class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-dark-card text-base" />
+                        </div>
+                        <div>
+                            <label for="username" class="block text-sm font-medium mb-1">Username</label>
+                            <input type="text" id="username" placeholder="E.g., @katekerry" class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-dark-card text-base" />
+                        </div>
+                        <div>
+                            <label for="nationality" class="block text-sm font-medium mb-1">Nationality</label>
+                            <input type="text" id="nationality" placeholder="E.g., UK" class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-dark-card text-base" />
+                        </div>
+                        <div>
+                            <label for="country" class="block text-sm font-medium mb-1">Country of Residence</label>
+                            <input type="text" id="country" placeholder="E.g., Thailand" class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-dark-card text-base" />
+                        </div>
+                        <div class="md:col-span-2">
+                            <label for="otherInfo" class="block text-sm font-medium mb-1">Other Information</label>
+                            <textarea id="otherInfo" rows="2" placeholder="Any other details that might help with the search..." class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-dark-card text-base"></textarea>
+                        </div>
+                    </div>
                 </div>
-                <div class="mt-4 md:mt-0 flex items-center space-x-3">
-                    <span class="bg-white/10 backdrop-blur-sm text-white text-xs px-3 py-1 rounded-full">Updated Today</span>
-                    <span class="hidden md:flex items-center bg-white/10 backdrop-blur-sm text-white text-xs px-3 py-1 rounded-full">
-                        <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
-                        </svg>
-                        Real-time Scan
-                    </span>
-                </div>
-            </div>
-            
-            <!-- Stats -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8 text-center">
-                <div class="bg-white/10 backdrop-blur-sm p-3 rounded-xl">
-                    <div class="text-2xl md:text-3xl font-bold">$9.4M+</div>
-                    <div class="text-xs md:text-sm text-white/80">Rewards Found</div>
-                </div>
-                <div class="bg-white/10 backdrop-blur-sm p-3 rounded-xl">
-                    <div class="text-2xl md:text-3xl font-bold">127+</div>
-                    <div class="text-xs md:text-sm text-white/80">Protocols Supported</div>
-                </div>
-                <div class="bg-white/10 backdrop-blur-sm p-3 rounded-xl">
-                    <div class="text-2xl md:text-3xl font-bold">41K+</div>
-                    <div class="text-xs md:text-sm text-white/80">Wallets Checked</div>
-                </div>
-                <div class="bg-white/10 backdrop-blur-sm p-3 rounded-xl">
-                    <div class="text-2xl md:text-3xl font-bold">9</div>
-                    <div class="text-xs md:text-sm text-white/80">Blockchains</div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Abstract shapes in background -->
-        <div class="absolute -top-24 -left-24 w-64 h-64 bg-primary-400/30 rounded-full blur-3xl"></div>
-        <div class="absolute top-1/2 -right-24 w-80 h-80 bg-primary-700/20 rounded-full blur-3xl"></div>
-    </header>
-
-    <main class="container mx-auto max-w-5xl px-4 py-8 relative">
-        <!-- Main scanner section -->
-        <section class="mb-10 bg-white dark:bg-gray-800 rounded-2xl shadow-glass dark:shadow-glass-dark p-8 animate-fade-in transition-all duration-300 transform hover:shadow-lg">
-            <h2 class="text-2xl md:text-3xl font-bold mb-4 flex items-center">
-                <svg class="w-7 h-7 mr-3 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
-                </svg>
-                Blockchain Scanner
-            </h2>
-            <p class="mb-6 text-gray-600 dark:text-gray-300 text-lg">Enter your wallet address to scan for unclaimed rewards, airdrops, votes, and approvals.</p>
-            
-            <div class="mb-6">
-                <label for="walletAddress" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Wallet Address</label>
-                <div class="relative">
-                    <textarea id="walletAddress" rows="2" placeholder="Enter your EMV compatible wallet address (0x...)" class="w-full px-5 py-4 text-base border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:focus:ring-primary-400 dark:focus:border-primary-400 dark:bg-gray-700 transition duration-200"></textarea>
-                    <button id="pasteButton" class="absolute right-3 top-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-sm bg-gray-100 dark:bg-gray-600 px-2 py-1 rounded-lg transition">
-                        Paste
+                
+                <div class="mt-6 text-center">
+                    <button id="searchButton" class="gradient-bg text-white font-medium py-3 px-8 rounded-lg shadow-lg hover:opacity-90 transition-opacity transform hover:scale-105 duration-200 disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none">
+                        Start Search
                     </button>
                 </div>
-                <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">We support Ethereum, Polygon, Arbitrum, Optimism, Avalanche, Base, and more</p>
-            </div>
+            </section>
             
-            <div class="flex flex-col sm:flex-row sm:items-center gap-4">
-                <button id="checkButton" class="flex-grow sm:flex-grow-0 bg-primary-600 hover:bg-primary-700 text-white font-medium py-3 px-8 rounded-xl transition duration-300 flex items-center justify-center shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
-                    <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            <!-- Progress Section (Initially Hidden) -->
+            <section id="progressSection" class="bg-light-card dark:bg-dark-card rounded-xl shadow-lg p-6 mb-8 hidden">
+                <h3 class="text-xl font-semibold mb-4 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-primary animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                     </svg>
-                    <span>Scan Wallet Now</span>
-                </button>
+                    Search in Progress
+                </h3>
                 
-                <div class="text-sm text-center sm:text-left text-gray-500 dark:text-gray-400 flex items-center">
-                    <svg class="h-5 w-5 mr-2 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                <div class="mb-6">
+                    <div class="flex justify-between mb-2">
+                        <span id="progressStatus" class="text-sm font-medium">Initializing AI engines...</span>
+                        <span id="progressPercentage" class="text-sm font-medium">0%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+                        <div id="progressBar" class="progress-bar h-2.5 rounded-full" style="width: 0%"></div>
+                    </div>
+                </div>
+                
+                <div id="progressLogs" class="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 max-h-60 overflow-y-auto text-sm">
+                    <div class="text-gray-600 dark:text-gray-400">
+                        <p>▶ Initializing AI facial recognition engine...</p>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Results Section (Initially Hidden) -->
+            <section id="resultsSection" class="bg-light-card dark:bg-dark-card rounded-xl shadow-lg p-6 mb-8 hidden">
+                <h3 class="text-xl font-semibold mb-4 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <span>Secure & Private Scan</span>
-                </div>
-            </div>
-        </section>
-
-        <!-- Progress section (hidden initially) -->
-        <section id="progressSection" class="mb-10 bg-white dark:bg-gray-800 rounded-2xl shadow-glass dark:shadow-glass-dark p-8 hidden animate-slide-up">
-            <h2 class="text-2xl font-bold mb-4 flex items-center">
-                <svg class="h-6 w-6 mr-3 text-primary-600 dark:text-primary-400 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-                </svg>
-                Scanning Your Wallet
-            </h2>
-            <p class="mb-6 text-gray-600 dark:text-gray-300">Deep scanning across multiple blockchains for unclaimed assets...</p>
-            
-            <div class="mb-8">
-                <div class="flex items-center justify-between mb-2">
-                    <span id="scanStep" class="text-sm font-medium text-primary-600 dark:text-primary-400">Initializing blockchain connections...</span>
-                    <span id="scanPercent" class="text-sm font-medium">0%</span>
-                </div>
-                <div class="h-2 w-full bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                    <div id="progressBar" class="h-full bg-primary-600 dark:bg-primary-500 rounded-full animate-progress"></div>
-                </div>
-            </div>
-            
-            <div id="checkStatus" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="bg-gray-100 dark:bg-gray-700 rounded-xl p-4">
-                    <div class="flex items-center opacity-70" id="airdropCheck">
-                        <div class="h-5 w-5 mr-2 rounded-full border-2 border-gray-300 dark:border-gray-500 flex-shrink-0"></div>
-                        <span>Checking for airdrops across 127 protocols...</span>
-                    </div>
-                </div>
-                <div class="bg-gray-100 dark:bg-gray-700 rounded-xl p-4">
-                    <div class="flex items-center opacity-70" id="rewardsCheck">
-                        <div class="h-5 w-5 mr-2 rounded-full border-2 border-gray-300 dark:border-gray-500 flex-shrink-0"></div>
-                        <span>Scanning for unclaimed rewards...</span>
-                    </div>
-                </div>
-                <div class="bg-gray-100 dark:bg-gray-700 rounded-xl p-4">
-                    <div class="flex items-center opacity-70" id="votesCheck">
-                        <div class="h-5 w-5 mr-2 rounded-full border-2 border-gray-300 dark:border-gray-500 flex-shrink-0"></div>
-                        <span>Checking governance proposals, votes and NFT...</span>
-                    </div>
-                </div>
-                <div class="bg-gray-100 dark:bg-gray-700 rounded-xl p-4">
-                    <div class="flex items-center opacity-70" id="approvalsCheck">
-                        <div class="h-5 w-5 mr-2 rounded-full border-2 border-gray-300 dark:border-gray-500 flex-shrink-0"></div>
-                        <span>Scanning for active and revoked approvals...</span>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Results section (hidden initially) -->
-        <section id="resultsSection" class="hidden animate-slide-up">
-            <div class="mb-6 bg-white dark:bg-gray-800 rounded-2xl shadow-glass dark:shadow-glass-dark p-8">
-                <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
-                    <div>
-                        <h2 class="text-2xl md:text-3xl font-bold mb-2 flex items-center">
-                            <svg class="h-7 w-7 mr-3 text-primary-600 dark:text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    Search Results
+                </h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <!-- Social Media Results -->
+                    <div class="bg-white dark:bg-dark-bg rounded-lg shadow p-4">
+                        <h4 class="text-lg font-medium mb-3 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                             </svg>
-                            Scan Results
-                        </h2>
-                        <p id="resultsAddress" class="text-sm font-mono bg-gray-100 dark:bg-gray-700 px-3 py-1 rounded-lg inline-block">0x...</p>
-                    </div>
-                    <div class="mt-4 md:mt-0">
-                        <button id="rescanlButton" class="text-primary-600 dark:text-primary-400 border border-primary-600 dark:border-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/30 font-medium py-2 px-4 rounded-lg transition flex items-center text-sm">
-                            <svg class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                            </svg>
-                            Scan Again
-                        </button>
-                    </div>
-                </div>
-                
-                <div id="resultsOverview" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                    <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-xl">
-                        <div class="flex items-center justify-between">
-                            <h3 class="font-semibold flex items-center">
-                                <svg class="h-4 w-4 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                                </svg>
-                                Airdrops
-                            </h3>
-                            <span id="airdropCount" class="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-sm px-2 py-1 rounded-full font-medium">0</span>
-                        </div>
-                    </div>
-                    <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-xl">
-                        <div class="flex items-center justify-between">
-                            <h3 class="font-semibold flex items-center">
-                                <svg class="h-4 w-4 mr-2 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                                Rewards
-                            </h3>
-                            <span id="rewardsCount" class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 text-sm px-2 py-1 rounded-full font-medium">0</span>
-                        </div>
-                    </div>
-                    <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-xl">
-                        <div class="flex items-center justify-between">
-                            <h3 class="font-semibold flex items-center">
-                                <svg class="h-4 w-4 mr-2 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-                                </svg>
-                                Votes
-                            </h3>
-                            <span id="votesCount" class="bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 text-sm px-2 py-1 rounded-full font-medium">0</span>
-                        </div>
-                    </div>
-                    <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-xl">
-                        <div class="flex items-center justify-between">
-                            <h3 class="font-semibold flex items-center">
-                                <svg class="h-4 w-4 mr-2 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                </svg>
-                                Approvals / NFT
-                            </h3>
-                            <span id="approvalsCount" class="bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 text-sm px-2 py-1 rounded-full font-medium">0</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="flex items-center mb-6 bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-700 rounded-lg p-4">
-                    <svg class="h-5 w-5 text-yellow-500 mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <p class="text-sm text-yellow-700 dark:text-yellow-200">
-                        We've found some unclaimed rewards for your wallet. Claim them soon to avoid expiration.
-                    </p>
-                </div>
-                
-                <div class="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="font-bold text-xl">Total Value Found</h3>
-                        <div class="text-2xl font-bold text-green-600 dark:text-green-400" id="totalValueFound">$0</div>
-                    </div>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">Estimated value based on current market prices</p>
-                </div>
-            </div>
-            
-            <!-- Unclaimed rewards details -->
-            <div id="rewardsDetails" class="mb-10 space-y-4">
-                <!-- Dynamic content will be inserted here -->
-            </div>
-
-            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-glass dark:shadow-glass-dark p-8 mb-8">
-                <h2 class="text-xl font-bold mb-4 flex items-center">
-                    <svg class="h-5 w-5 mr-2 text-primary-600 dark:text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    Claiming Instructions
-                </h2>
-                <p class="mb-4 text-gray-600 dark:text-gray-300">To claim your rewards, follow these steps:</p>
-                <ol class="list-decimal list-inside space-y-2 text-gray-600 dark:text-gray-300 mb-6">
-                    <li>Visit the official project website by clicking the link</li>
-                    <li>Connect your wallet on their platform</li>
-                    <li>Navigate to the rewards or airdrop section</li>
-                    <li>Follow the instructions to claim your rewards</li>
-                </ol>
-                <div class="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg p-4">
-                    <p class="text-sm text-red-700 dark:text-red-300 flex items-start">
-                        <svg class="h-5 w-5 text-red-500 mr-2 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                        </svg>
-                        <span>Always verify you're on the correct website before connecting your wallet. Never share your private keys or seed phrases with anyone. This tool only reads public blockchain data.</span>
-                    </p>
-                </div>
-            </div>
-        </section>
-
-        <!-- Information section -->
-        <section class="mb-12 grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-glass dark:shadow-glass-dark p-6 transform transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
-                <div class="flex items-center mb-4">
-                    <div class="bg-blue-100 dark:bg-blue-900/50 p-3 rounded-xl mr-4">
-                        <svg class="h-6 w-6 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-                        </svg>
-                    </div>
-                    <h3 class="font-bold text-lg">Comprehensive Scan</h3>
-                </div>
-                <p class="text-gray-600 dark:text-gray-300">Our scanner checks 127+ protocols across 9 blockchains for airdrops, rewards, governance votes, and staking opportunities.</p>
-            </div>
-            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-glass dark:shadow-glass-dark p-6 transform transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
-                <div class="flex items-center mb-4">
-                    <div class="bg-green-100 dark:bg-green-900/50 p-3 rounded-xl mr-4">
-                        <svg class="h-6 w-6 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                        </svg>
-                    </div>
-                    <h3 class="font-bold text-lg">100% Secure</h3>
-                </div>
-                <p class="text-gray-600 dark:text-gray-300">We only read public blockchain data. Your private keys remain secure, and we never request access to your wallet or funds.</p>
-            </div>
-            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-glass dark:shadow-glass-dark p-6 transform transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
-                <div class="flex items-center mb-4">
-                    <div class="bg-purple-100 dark:bg-purple-900/50 p-3 rounded-xl mr-4">
-                        <svg class="h-6 w-6 text-purple-600 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                        </svg>
-                    </div>
-                    <h3 class="font-bold text-lg">Real-Time Data</h3>
-                </div>
-                <p class="text-gray-600 dark:text-gray-300">Our database is updated hourly with the latest airdrops, reward programs, and governance proposals across all supported protocols.</p>
-            </div>
-        </section>
-        
-        <!-- FAQ Section -->
-        <section class="mb-12 bg-white dark:bg-gray-800 rounded-2xl shadow-glass dark:shadow-glass-dark p-8">
-            <h2 class="text-2xl font-bold mb-6">Frequently Asked Questions</h2>
-            
-            <div class="space-y-4">
-                <div class="border-b border-gray-200 dark:border-gray-700 pb-4">
-                    <h3 class="font-semibold text-lg mb-2">What is a wallet rewards checker?</h3>
-                    <p class="text-gray-600 dark:text-gray-300">A wallet rewards checker scans your crypto wallet address across multiple blockchains to find unclaimed airdrops, staking rewards, governance tokens, and other assets you might not know you own.</p>
-                </div>
-                
-                <div class="border-b border-gray-200 dark:border-gray-700 pb-4">
-                    <h3 class="font-semibold text-lg mb-2">Is this service free to use?</h3>
-                    <p class="text-gray-600 dark:text-gray-300">Yes, our wallet scanner is completely free to use. We provide this as a service to the crypto community to help users discover value they may have overlooked.</p>
-                </div>
-                
-                <div class="border-b border-gray-200 dark:border-gray-700 pb-4">
-                    <h3 class="font-semibold text-lg mb-2">How do I check for unclaimed crypto rewards?</h3>
-                    <p class="text-gray-600 dark:text-gray-300">Simply enter your wallet address in the scanner above, click "Scan Wallet Now," and our system will automatically check for all types of unclaimed rewards across multiple protocols and blockchains.</p>
-                </div>
-                
-                <div class="border-b border-gray-200 dark:border-gray-700 pb-4">
-                    <h3 class="font-semibold text-lg mb-2">What types of rewards can I find?</h3>
-                    <p class="text-gray-600 dark:text-gray-300">Our scanner can find unclaimed airdrops, staking rewards, liquidity mining rewards, governance tokens, retroactive rewards, points, and potentially dangerous token approvals.</p>
-                </div>
-                
-                <div>
-                    <h3 class="font-semibold text-lg mb-2">What blockchains do you support?</h3>
-                    <p class="text-gray-600 dark:text-gray-300">We currently support Ethereum, Polygon, Arbitrum, Optimism, Avalanche, Base, BNB Chain, Solana, and Cosmos ecosystem chains. We're continuously adding more networks.</p>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <footer class="bg-gray-100 dark:bg-gray-800 py-8 px-4">
-        <div class="container mx-auto max-w-5xl">
-            <div class="flex flex-col md:flex-row justify-between items-center">
-                <div class="mb-4 md:mb-0">
-                    <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-2">Crypto Scanner Pro</h2>
-                    <p class="text-sm text-gray-600 dark:text-gray-400">Find unclaimed rewards across all blockchains</p>
-                </div>
-                
-                <div class="flex items-center space-x-4">
-                    <a href="#" class="text-gray-500 hover:text-primary-600 dark:hover:text-primary-400">
-                        <span class="sr-only">Twitter</span>
-                        <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
-                        </svg>
-                    </a>
-                    <a href="#" class="text-gray-500 hover:text-primary-600 dark:hover:text-primary-400">
-                        <span class="sr-only">GitHub</span>
-                        <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
-                            <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"></path>
-                        </svg>
-                    </a>
-                </div>
-            </div>
-            
-            <div class="mt-6 border-t border-gray-200 dark:border-gray-700 pt-4 text-center">
-                <p class="text-sm text-gray-600 dark:text-gray-400">&copy; 2025 Crypto Scanner Pro. This is a demonstration version for educational purposes only.</p>
-            </div>
-        </div>
-    </footer>
-
-    <script>
-        // DOM Elements
-        const walletAddress = document.getElementById('walletAddress');
-        const pasteButton = document.getElementById('pasteButton');
-        const checkButton = document.getElementById('checkButton');
-        const progressSection = document.getElementById('progressSection');
-        const resultsSection = document.getElementById('resultsSection');
-        const progressBar = document.getElementById('progressBar');
-        const scanStep = document.getElementById('scanStep');
-        const scanPercent = document.getElementById('scanPercent');
-        const resultsAddress = document.getElementById('resultsAddress');
-        const rescanlButton = document.getElementById('rescanlButton');
-        const rewardsDetails = document.getElementById('rewardsDetails');
-        const totalValueFound = document.getElementById('totalValueFound');
-        
-        // Check items
-        const airdropCheck = document.getElementById('airdropCheck');
-        const rewardsCheck = document.getElementById('rewardsCheck');
-        const votesCheck = document.getElementById('votesCheck');
-        const approvalsCheck = document.getElementById('approvalsCheck');
-        
-        // Results counters
-        const airdropCount = document.getElementById('airdropCount');
-        const rewardsCount = document.getElementById('rewardsCount');
-        const votesCount = document.getElementById('votesCount');
-        const approvalsCount = document.getElementById('approvalsCount');
-        
-        // Sample projects for random selection
-        const projects = [
-            {
-                name: "Eigenlayer",
-                symbol: "EIGEN",
-                type: "rewards",
-                amount: "234",
-                value: 186,
-                days: 12,
-                logo: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%233366FF'/%3E%3Cpath d='M30 30h40v10H30zM30 45h40v10H30zM30 60h40v10H30z' fill='white'/%3E%3C/svg%3E"
-            },
-            {
-                name: "Swell Network",
-                symbol: "SWELL",
-                type: "rewards",
-                amount: "3567",
-                value: 1446,
-                days: 1,
-                logo: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%2300AAFF'/%3E%3Cpath d='M30 40c0 0 10-15 40 0c-15 15-25 0-40 0zM30 60c0 0 10-15 40 0c-15 15-25 0-40 0z' fill='white'/%3E%3C/svg%3E"
-            },
-            {
-                name: "Layeredge",
-                symbol: "ZRO",
-                type: "airdrop",
-                amount: "175",
-                value: 525,
-                days: 5,
-                logo: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='50' fill='%23FF6B00'/%3E%3Cpath d='M30 30l40 40M70 30l-40 40' stroke='white' stroke-width='8'/%3E%3C/svg%3E"
-            },
-            {
-                name: "Sui",
-                symbol: "SUI",
-                type: "airdrop",
-                amount: "321",
-                value: 276,
-                days: 7,
-                logo: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%232D374B'/%3E%3Cpath d='M50 25l20 30l-20 20l-20-20z' fill='%232C96F6'/%3E%3C/svg%3E"
-            },
-            {
-                name: "Base",
-                symbol: "BASE",
-                type: "rewards",
-                amount: "1233",
-                value: 756,
-                days: 9,
-                logo: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%230052FF'/%3E%3Ccircle cx='50' cy='50' r='25' fill='white'/%3E%3C/svg%3E"
-            },
-            {
-                name: "Optimism",
-                symbol: "OP",
-                type: "airdrop",
-                amount: "455",
-                value: 385,
-                days: 3,
-                logo: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23FF0420'/%3E%3Ccircle cx='50' cy='50' r='25' fill='white'/%3E%3C/svg%3E"
-            },
-            {
-                name: "Xos",
-                symbol: "XOS",
-                type: "rewards",
-                amount: "730",
-                value: 290,
-                days: 14,
-                logo: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='25' fill='%23007BFF'/%3E%3Cpath d='M25 25h50v10H25zM25 45h50v10H25zM25 65h50v10H25z' fill='white'/%3E%3C/svg%3E"
-            },
-            {
-                name: "Taker",
-                symbol: "TAKER",
-                type: "airdrop",
-                amount: "89",
-                value: 320,
-                days: 6,
-                logo: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='0' fill='%23F6851B'/%3E%3Cpath d='M30 20l40 0l-5 30l-15 10l-15-10z' fill='white'/%3E%3C/svg%3E"
-            },
-            {
-                name: "Uniswap",
-                symbol: "UNI",
-                type: "approvals",
-                amount: "0",
-                value: 0,
-                days: 0,
-                logo: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%23FF007A'/%3E%3Ccircle cx='65' cy='35' r='8' fill='white'/%3E%3Ccircle cx='35' cy='35' r='8' fill='white'/%3E%3Cpath d='M30 60c10 10 30 10 40 0' stroke='white' stroke-width='4' fill='none'/%3E%3C/svg%3E"
-            },
-            {
-                name: "Pendle",
-                symbol: "PENDLE",
-                type: "rewards",
-                amount: "623",
-                value: 310,
-                days: 11,
-                logo: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='25' fill='%2349A887'/%3E%3Ccircle cx='50' cy='50' r='25' stroke='white' stroke-width='6' fill='none'/%3E%3C/svg%3E"
-            },
-            {
-                name: "Starknet",
-                symbol: "STRK",
-                type: "airdrop",
-                amount: "201",
-                value: 520,
-                days: 4,
-                logo: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='0' fill='%233333FF'/%3E%3Cpath d='M30 30l40 0l0 40l-40 0z' stroke='white' stroke-width='6' fill='none'/%3E%3C/svg%3E"
-            }
-        ];
-        
-        // Approval projects
-        const approvalProjects = [
-            {
-                name: "Uniswap V3",
-                status: "Active",
-                riskLevel: "Low",
-                lastUsed: "2 days ago"
-            },
-            {
-                name: "SushiSwap",
-                status: "Active",
-                riskLevel: "Medium",
-                lastUsed: "1 month ago"
-            },
-            {
-                name: "PancakeSwap",
-                status: "Inactive",
-                riskLevel: "Medium",
-                lastUsed: "3 months ago"
-            },
-            {
-                name: "1inch",
-                status: "Active",
-                riskLevel: "Low",
-                lastUsed: "5 days ago"
-            },
-            {
-                name: "OpenSea",
-                status: "Expired",
-                riskLevel: "Medium",
-                lastUsed: "4 months ago"
-            }
-        ];
-        
-        // Paste button functionality
-        pasteButton.addEventListener('click', async function() {
-            try {
-                const text = await navigator.clipboard.readText();
-                walletAddress.value = text;
-            } catch (err) {
-                console.error('Failed to read clipboard', err);
-            }
-        });
-        
-        // Generate random result data
-        function generateRandomResults() {
-            // Shuffle and select random projects
-            const shuffledProjects = [...projects].sort(() => 0.5 - Math.random());
-            
-            // Determine how many of each type to show (random 0-3)
-            const numAirdrops = Math.floor(Math.random() * 3);
-            const numRewards = Math.floor(Math.random() * 3) + 1; // At least 1 reward
-            const numVotes = Math.floor(Math.random() * 2);
-            const numApprovals = Math.floor(Math.random() * 4);
-            
-            // Update counts
-            airdropCount.textContent = numAirdrops;
-            rewardsCount.textContent = numRewards;
-            votesCount.textContent = numVotes;
-            approvalsCount.textContent = numApprovals;
-            
-            // Filter projects by type
-            const airdrops = shuffledProjects.filter(p => p.type === 'airdrop').slice(0, numAirdrops);
-            const rewards = shuffledProjects.filter(p => p.type === 'rewards').slice(0, numRewards);
-            
-            // If we need to, force some rewards if there aren't enough after filtering
-            while (rewards.length < numRewards) {
-                const project = {...shuffledProjects.find(p => p.type === 'rewards')};
-                project.amount = (Math.floor(Math.random() * 3000) + 100).toString();
-                project.value = Math.floor(Math.random() * 1000) + 100;
-                project.days = Math.floor(Math.random() * 14) + 1;
-                rewards.push(project);
-            }
-            
-            // Combine all results
-            const allResults = [...airdrops, ...rewards];
-            
-            // Calculate total value
-            const totalValue = allResults.reduce((sum, item) => sum + item.value, 0);
-            totalValueFound.textContent = `$${totalValue.toLocaleString()}`;
-            
-            // Generate HTML for all results
-            let resultsHTML = '';
-            
-            // Add rewards and airdrops
-            allResults.forEach(item => {
-                const timeClass = item.days <= 3 ? 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200' : 
-                                  item.days <= 7 ? 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200' : 
-                                  'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200';
-                                  
-                const typeClass = item.type === 'airdrop' ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200' : 
-                                 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200';
-                                 
-                const typeLabel = item.type === 'airdrop' ? 'AIRDROP' : 'REWARD';
-                
-                resultsHTML += `
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-glass dark:shadow-glass-dark p-6 border-l-4 border-primary-600 dark:border-primary-400 transform transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="flex items-center">
-                            <div class="w-10 h-10 rounded-full overflow-hidden mr-3 flex-shrink-0">
-                                <img src="${item.logo}" alt="${item.name} logo" class="w-full h-full object-cover">
-                            </div>
-                            <div>
-                                <h3 class="text-lg font-bold">${item.name}</h3>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">Protocol</p>
-                            </div>
-                        </div>
-                        <span class="${typeClass} text-xs px-2 py-1 rounded-full font-medium">${typeLabel}</span>
+                            Social Media
+                        </h4>
+                        <p id="socialMediaResults" class="text-sm text-gray-600 dark:text-gray-400"></p>
                     </div>
                     
-                    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
-                        <div>
-                            <h3 class="text-xl font-bold flex items-center">
-                                <span class="text-primary-600 dark:text-primary-400">${item.amount} $${item.symbol}</span>
-                                <span class="bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-100 text-xs px-2 py-1 rounded-full ml-2">UNCLAIMED</span>
-                            </h3>
-                            <p class="text-gray-600 dark:text-gray-300 text-sm mt-1">Estimated Value: <span class="font-medium">$${item.value.toLocaleString()} USD</span></p>
-                        </div>
-                        <div class="mt-2 md:mt-0">
-                            <div class="${timeClass} px-3 py-1 rounded-full text-sm flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                                ${item.days} day${item.days !== 1 ? 's' : ''} left
-                            </div>
-                        </div>
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <a href="https://example.com" target="_blank" class="text-primary-600 dark:text-primary-400 hover:underline text-sm flex items-center">
-                            <span>Claim on ${item.name} website</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    <!-- Dating App Results -->
+                    <div class="bg-white dark:bg-dark-bg rounded-lg shadow p-4">
+                        <h4 class="text-lg font-medium mb-3 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-pink-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                             </svg>
-                        </a>
-                        <button class="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            Details
-                        </button>
+                            Dating Apps
+                        </h4>
+                        <p id="datingAppResults" class="text-sm text-gray-600 dark:text-gray-400"></p>
                     </div>
-                </div>
-                `;
-            });
-            
-            // Add approvals if any
-            if (numApprovals > 0) {
-                const selectedApprovals = approvalProjects.sort(() => 0.5 - Math.random()).slice(0, numApprovals);
-                
-                resultsHTML += `
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-glass dark:shadow-glass-dark p-6 border-l-4 border-red-500 dark:border-red-400">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-bold flex items-center">
-                            <svg class="h-5 w-5 mr-2 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    
+                    <!-- Adult Platform Results -->
+                    <div class="bg-white dark:bg-dark-bg rounded-lg shadow p-4">
+                        <h4 class="text-lg font-medium mb-3 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                             </svg>
-                            Token Approvals Found
-                        </h3>
-                        <span class="bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 text-xs px-2 py-1 rounded-full">${numApprovals} Approvals</span>
-                    </div>
-                    <p class="text-gray-600 dark:text-gray-300 text-sm mb-4">The following contracts have permission to spend tokens from your wallet:</p>
-                    
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                            <thead>
-                                <tr>
-                                    <th class="py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Protocol</th>
-                                    <th class="py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
-                                    <th class="py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Risk Level</th>
-                                    <th class="py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Last Used</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-                `;
-                
-                selectedApprovals.forEach(approval => {
-                    const statusClass = approval.status === 'Active' ? 'text-green-600 dark:text-green-400' : 
-                                      approval.status === 'Inactive' ? 'text-yellow-600 dark:text-yellow-400' : 
-                                      'text-gray-500';
-                                      
-                    const riskClass = approval.riskLevel === 'Low' ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200' : 
-                                    approval.riskLevel === 'Medium' ? 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200' : 
-                                    'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200';
-                    
-                    resultsHTML += `
-                    <tr>
-                        <td class="py-3 text-sm font-medium">${approval.name}</td>
-                        <td class="py-3 text-sm ${statusClass}">${approval.status}</td>
-                        <td class="py-3 text-sm">
-                            <span class="${riskClass} text-xs px-2 py-1 rounded-full">${approval.riskLevel}</span>
-                        </td>
-                        <td class="py-3 text-sm text-gray-500 dark:text-gray-400">${approval.lastUsed}</td>
-                    </tr>
-                    `;
-                });
-                
-                resultsHTML += `
-                            </tbody>
-                        </table>
+                            Adult Platforms
+                        </h4>
+                        <p id="adultPlatformResults" class="text-sm text-gray-600 dark:text-gray-400"></p>
                     </div>
                     
-                    <div class="mt-4">
-                        <a href="https://example.com" target="_blank" class="text-primary-600 dark:text-primary-400 hover:underline text-sm flex items-center">
-                            <span>Manage approvals</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    <!-- Worldwide Internet Results -->
+                    <div class="bg-white dark:bg-dark-bg rounded-lg shadow p-4">
+                        <h4 class="text-lg font-medium mb-3 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
-                        </a>
+                            Worldwide Internet
+                        </h4>
+                        <p id="internetResults" class="text-sm text-gray-600 dark:text-gray-400"></p>
                     </div>
                 </div>
-                `;
-            }
-            
-            // Add governance votes if any
-            if (numVotes > 0) {
-                resultsHTML += `
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-glass dark:shadow-glass-dark p-6 border-l-4 border-purple-500 dark:border-purple-400">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-bold flex items-center">
-                            <svg class="h-5 w-5 mr-2 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-                            </svg>
-                            Governance Votes
-                        </h3>
-                        <span class="bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 text-xs px-2 py-1 rounded-full">${numVotes} Active</span>
+                
+                <!-- Blurred Results Preview -->
+                <div class="mb-8">
+                    <h4 class="text-lg font-medium mb-4">Preview of Found Media</h4>
+                    <div id="previewResults" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <!-- Preview images will be added here -->
                     </div>
-                    <p class="text-gray-600 dark:text-gray-300 text-sm mb-4">Your wallet is eligible to vote on the following governance proposals:</p>
-                    
-                    <div class="space-y-4">
-                `;
+                </div>
                 
-                // Add some random governance proposals
-                const proposals = [
-                    {
-                        protocol: "Aave",
-                        title: "Aave v3 Liquidity Mining Program",
-                        endTime: "2 days"
-                    },
-                    {
-                        protocol: "Compound",
-                        title: "Add USDC as Collateral Asset",
-                        endTime: "5 days"
-                    },
-                    {
-                        protocol: "MakerDAO",
-                        title: "Adjust Stability Fee for ETH-A",
-                        endTime: "3 days"
-                    }
-                ];
-                
-                const selectedProposals = proposals.sort(() => 0.5 - Math.random()).slice(0, numVotes);
-                
-                selectedProposals.forEach(proposal => {
-                    resultsHTML += `
-                    <div class="bg-gray-100 dark:bg-gray-700 rounded-lg p-4">
-                        <div class="flex justify-between mb-2">
-                            <span class="text-sm font-semibold">${proposal.protocol}</span>
-                            <span class="text-xs text-gray-500 dark:text-gray-400">Ends in ${proposal.endTime}</span>
+                <!-- Pricing Plans -->
+                <div>
+                    <h4 class="text-lg font-medium mb-4">Unlock Complete Results</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Basic Plan -->
+                        <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-6 hover:shadow-lg transition-shadow">
+                            <h5 class="text-xl font-semibold mb-2">Basic Plan</h5>
+                            <p class="text-3xl font-bold mb-4">$399</p>
+                            <ul class="mb-6 space-y-2">
+                                <li class="flex items-start">
+                                    <svg class="h-5 w-5 text-green-500 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                    30 successful searches
+                                </li>
+                                <li class="flex items-start">
+                                    <svg class="h-5 w-5 text-green-500 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                    Basic support
+                                </li>
+                                <li class="flex items-start">
+                                    <svg class="h-5 w-5 text-green-500 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                    Full access to current results
+                                </li>
+                            </ul>
+                            <button class="purchase-btn w-full py-2 px-4 bg-primary text-white rounded-lg hover:bg-opacity-90 transition-colors" data-plan="basic">Unlock Now</button>
                         </div>
-                        <p class="text-sm font-medium mb-3">${proposal.title}</p>
-                        <a href="https://example.com" target="_blank" class="text-primary-600 dark:text-primary-400 hover:underline text-xs flex items-center">
-                            <span>Cast your vote</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                            </svg>
-                        </a>
-                    </div>
-                    `;
-                });
-                
-                resultsHTML += `
+                        
+                        <!-- Pro Plan -->
+                        <div class="border-2 border-primary rounded-lg p-6 hover:shadow-lg transition-shadow relative">
+                            <span class="absolute top-0 right-0 bg-secondary text-white text-xs px-3 py-1 rounded-bl-lg rounded-tr-lg uppercase font-semibold">Popular</span>
+                            <h5 class="text-xl font-semibold mb-2">Pro Plan</h5>
+                            <p class="text-3xl font-bold mb-4">$599</p>
+                            <ul class="mb-6 space-y-2">
+                                <li class="flex items-start">
+                                    <svg class="h-5 w-5 text-green-500 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                    Unlimited searches
+                                </li>
+                                <li class="flex items-start">
+                                    <svg class="h-5 w-5 text-green-500 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                    Priority support
+                                </li>
+                                <li class="flex items-start">
+                                    <svg class="h-5 w-5 text-green-500 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                    Access to all platform features
+                                </li>
+                                <li class="flex items-start">
+                                    <svg class="h-5 w-5 text-green-500 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                    Real-time alerts for new matches
+                                </li>
+                            </ul>
+                            <button class="purchase-btn w-full py-2 px-4 gradient-bg text-white rounded-lg hover:opacity-90 transition-opacity" data-plan="pro">Unlock Now</button>
+                        </div>
                     </div>
                 </div>
-                `;
-            }
+            </section>
             
-            // Update the DOM
-            rewardsDetails.innerHTML = resultsHTML;
-        }
-        
-        // Simulate checking a wallet
-        async function simulateChecking() {
-            return new Promise(resolve => {
-                // Reset progress
-                progressBar.style.width = '0%';
-                progressBar.classList.remove('animate-progress');
-                void progressBar.offsetWidth; // Trigger reflow
-                progressBar.classList.add('animate-progress');
+            <!-- Payment Section (Initially Hidden) -->
+            <section id="paymentSection" class="bg-light-card dark:bg-dark-card rounded-xl shadow-lg p-6 mb-8 hidden">
+                <h3 class="text-xl font-semibold mb-4 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Complete Your Purchase
+                </h3>
                 
-                // Update initial state
-                scanStep.textContent = 'Initializing blockchain connections...';
-                scanPercent.textContent = '0%';
+                <div class="mb-6">
+                    <p class="text-center mb-4">You have selected: <span id="selectedPlan" class="font-semibold"></span></p>
+                    <div class="flex justify-center items-center mb-4">
+                        <p class="text-lg mr-4">Total Amount:</p>
+                        <p id="dollarAmount" class="text-2xl font-bold"></p>
+                    </div>
+                    <div class="flex justify-center items-center">
+                        <p class="text-lg mr-4">BTC Amount:</p>
+                        <p id="btcAmount" class="text-2xl font-bold"></p>
+                    </div>
+                    <p class="text-xs text-center text-gray-500 mt-2">* BTC amount calculated at current exchange rate</p>
+                </div>
                 
-                // Update steps with delays
-                setTimeout(() => {
-                    scanStep.textContent = 'Checking for airdrops...';
-                    scanPercent.textContent = '25%';
-                    
-                    airdropCheck.innerHTML = `
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary-600 dark:text-primary-400 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                <div class="bg-gray-100 dark:bg-gray-800 rounded-lg p-6 mb-6">
+                    <h4 class="text-lg font-medium mb-4">Payment Instructions</h4>
+                    <p class="mb-4">Please send the exact BTC amount to the following address:</p>
+                    <div class="bg-white dark:bg-gray-700 p-4 rounded-lg mb-4 break-all">
+                        <p id="btcAddress" class="font-mono text-sm"></p>
+                    </div>
+                    <button id="copyAddress" class="w-full py-2 px-4 bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
                         </svg>
-                        <span>Airdrops checked</span>
-                    `;
-                    airdropCheck.classList.remove('opacity-70');
-                }, 2500);
+                        Copy Address
+                    </button>
+                </div>
                 
-                setTimeout(() => {
-                    scanStep.textContent = 'Scanning for unclaimed rewards...';
-                    scanPercent.textContent = '50%';
-                    
-                    rewardsCheck.innerHTML = `
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary-600 dark:text-primary-400 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                        </svg>
-                        <span>Rewards checked</span>
-                    `;
-                    rewardsCheck.classList.remove('opacity-70');
-                }, 5000);
+                <div class="bg-yellow-50 dark:bg-yellow-900/30 border-l-4 border-yellow-400 dark:border-yellow-600 p-4 rounded-r-lg mb-6">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <svg class="h-5 w-5 text-yellow-400 dark:text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-yellow-700 dark:text-yellow-200">
+                                After sending payment, your account will be automatically activated within 15 minutes. For faster activation, please contact support with your transaction ID.
+                            </p>
+                        </div>
+                    </div>
+                </div>
                 
-                setTimeout(() => {
-                    scanStep.textContent = 'Checking governance proposals...';
-                    scanPercent.textContent = '75%';
-                    
-                    votesCheck.innerHTML = `
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary-600 dark:text-primary-400 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                        </svg>
-                        <span>Governance proposals checked</span>
-                    `;
-                    votesCheck.classList.remove('opacity-70');
-                }, 7500);
-                
-                setTimeout(() => {
-                    scanStep.textContent = 'Scanning for approvals...';
-                    scanPercent.textContent = '90%';
-                    
-                    approvalsCheck.innerHTML = `
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary-600 dark:text-primary-400 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                        </svg>
-                        <span>Approvals checked</span>
-                    `;
-                    approvalsCheck.classList.remove('opacity-70');
-                    
-                    // Complete
-                    setTimeout(() => {
-                        scanStep.textContent = 'Scan complete!';
-                        scanPercent.textContent = '100%';
-                        setTimeout(resolve, 1000);
-                    }, 1000);
-                }, 9000);
-            });
-        }
-        
-        // Check wallet button click
-        checkButton.addEventListener('click', async function() {
-            // Validate input (basic check)
-            if (!walletAddress.value.trim()) {
-                // Add shake animation
-                walletAddress.classList.add('border-red-500', 'shake');
-                setTimeout(() => {
-                    walletAddress.classList.remove('border-red-500', 'shake');
-                }, 800);
-                return;
-            }
-            
-            // Display the wallet address
-            resultsAddress.textContent = walletAddress.value.trim();
-            
-            // Show progress section, hide results
-            progressSection.classList.remove('hidden');
-            resultsSection.classList.add('hidden');
-            
-            // Scroll to progress section
-            progressSection.scrollIntoView({ behavior: 'smooth' });
-            
-            // Simulate checking
-            await simulateChecking();
-            
-            // Generate random results
-            generateRandomResults();
-            
-            // Show results
-            progressSection.classList.add('hidden');
-            resultsSection.classList.remove('hidden');
-            
-            // Scroll to results
-            resultsSection.scrollIntoView({ behavior: 'smooth' });
-        });
-        
-        // Rescan button click
-        rescanlButton.addEventListener('click', function() {
-            // Scroll to top scanner section
-            document.body.scrollIntoView({ behavior: 'smooth' });
-            
-            // Optionally clear the address
-            // walletAddress.value = '';
-        });
-    </script>
-</body>
-</html>
+                <div class="text-center">
+                    <button id="backToResults" class="py-2 px-6 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+                        Back to Results
+                    </button>
+                </div>
+            </section>
+        </main>
